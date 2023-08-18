@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-var url = "https://adventofcode.com/2015/day/1";
+var url = "https://adventofcode.com/2015/day/2";
 var solutionFolder = GetSolutionFolder();
 var libFolder = Path.Combine(solutionFolder, "adventofcode");
 var testFolder = Path.Combine(solutionFolder, "adventofcode.tests");
@@ -68,9 +68,9 @@ else
 File.WriteAllText(Path.Combine(problemDirectory, $"Input{solutionName}.cs"), $@"
 namespace {solutionNamespace};
 
-public class Input{solutionName}
+public abstract class Input{solutionName}
 {{
-    public string MainInput = \@""{{input}}"";
+    public const string MainInput = @""{{input}}"";
 }}");
 
 return;
