@@ -13,7 +13,7 @@ public abstract class Solution2015day0004
             }).Last() + 1;
 
     // from SO -> https://stackoverflow.com/a/24031467
-    public static string CreateMD5(string input)
+    private static string CreateMD5(string input)
     {
         // Use input string to calculate MD5 hash
         var inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
