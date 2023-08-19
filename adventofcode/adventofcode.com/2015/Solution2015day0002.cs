@@ -1,9 +1,9 @@
 
 using System.Numerics;
 
-namespace adventofcode.adventofcode.com._2015.day._2;
+namespace adventofcode.adventofcode.com._2015;
 
-public class Solution2015day2
+public class Solution2015day0002
 {
     public static long SolvePart1(string input)
         => input

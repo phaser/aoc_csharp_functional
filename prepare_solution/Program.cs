@@ -2,7 +2,8 @@
 
 using System.Reflection;
 
-var url = "https://adventofcode.com/2015/day/2";
+var url = "https://adventofcode.com/2015/day/4";
+var year = "2015";
 var solutionFolder = GetSolutionFolder();
 var libFolder = Path.Combine(solutionFolder, "adventofcode");
 var testFolder = Path.Combine(solutionFolder, "adventofcode.tests");
@@ -10,39 +11,41 @@ var uri = new Uri(url);
 var aocDir = Path.Combine(libFolder, uri.Host);
 var testDir = Path.Combine(testFolder, uri.Host);
 CreateMainDirIfNotExists(aocDir);
-CreateMainDirIfNotExists(testDir);
-var problemDirectory = CreateDirHierarchyIfNotExists(uri, aocDir);
+var problemDirectory = CreateProblemsDirectory(aocDir, year);
 var solutionName = uri.LocalPath
     .Split('/')
     .Where(p => !string.IsNullOrEmpty(p))
+    .Select(p => char.IsDigit(p[0]) ? $"{int.Parse(p):0000}" : p)
     .Aggregate((a, b) => a + b);
 var solutionNamespace = "adventofcode." + uri.Host + "." 
                         + uri.LocalPath
                             .Split('/')
                             .Where(p => !string.IsNullOrEmpty(p))
-                            .Select(p => char.IsDigit(p[0]) ? $"_{p}" : p)
+                            .Select(p => char.IsDigit(p[0]) ? $"_{int.Parse(p):0000}" : p)
                             .Aggregate((a, b) => a + "." + b);
 File.WriteAllText(Path.Combine(problemDirectory, $"Solution{solutionName}.cs"), $@"
-namespace {solutionNamespace};
+namespace adventofcode.{uri.Host}._{year};
 
 public class Solution{solutionName}
 {{
 }}
 ");
 
-problemDirectory = CreateDirHierarchyIfNotExists(uri, testDir);
+CreateMainDirIfNotExists(testDir);
+problemDirectory = CreateProblemsDirectory(testDir, year);
 solutionName = uri.LocalPath
     .Split('/')
     .Where(p => !string.IsNullOrEmpty(p))
+    .Select(p => char.IsDigit(p[0]) ? $"{int.Parse(p):0000}" : p)
     .Aggregate((a, b) => a + b);
 solutionNamespace = "adventofcode.tests." + uri.Host + "." 
                         + uri.LocalPath
                             .Split('/')
                             .Where(p => !string.IsNullOrEmpty(p))
-                            .Select(p => char.IsDigit(p[0]) ? $"_{p}" : p)
+                            .Select(p => char.IsDigit(p[0]) ? $"_{int.Parse(p):0000}" : p)
                             .Aggregate((a, b) => a + "." + b);
 File.WriteAllText(Path.Combine(problemDirectory, $"Testing{solutionName}.cs"), $@"
-namespace {solutionNamespace};
+namespace adventofcode.tests.{uri.Host}._{year};
 
 public class Testing{solutionName}
 {{
@@ -50,28 +53,10 @@ public class Testing{solutionName}
     public void TestSolution()
     {{
     }}
+
+    public const string MainInput = @""{{input}}"";
 }}
 ");
-
-var httpClient = new HttpClient();
-var response = await httpClient.GetAsync($"{url}/input");
-var input = "";
-if (response.IsSuccessStatusCode)
-{
-    input = await response.Content.ReadAsStringAsync();
-}
-else
-{
-    Console.Error.WriteLine("Error occured at input downloading");
-}
-
-File.WriteAllText(Path.Combine(problemDirectory, $"Input{solutionName}.cs"), $@"
-namespace {solutionNamespace};
-
-public abstract class Input{solutionName}
-{{
-    public const string MainInput = @""{{input}}"";
-}}");
 
 return;
 
@@ -95,20 +80,13 @@ void CreateMainDirIfNotExists(string s)
     }
 }
 
-string CreateDirHierarchyIfNotExists(Uri uri1, string aocDir1)
+string CreateProblemsDirectory(string s1, string year1)
 {
-    var paths = uri1.LocalPath.Split('/');
-    var currentPath = aocDir1;
-    foreach (var path in paths)
+    var problemDirectory1 = Path.Combine(s1, year1);
+    if (!Directory.Exists(problemDirectory1))
     {
-        if (string.IsNullOrEmpty(path))
-            continue;
-        currentPath = Path.Combine(currentPath, path);
-        if (!Directory.Exists(currentPath))
-        {
-            Directory.CreateDirectory(currentPath);
-        }
+        Directory.CreateDirectory(problemDirectory1);
     }
 
-    return currentPath;
+    return problemDirectory1;
 }

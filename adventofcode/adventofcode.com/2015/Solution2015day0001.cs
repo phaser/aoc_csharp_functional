@@ -1,5 +1,5 @@
 
-namespace adventofcode.adventofcode.com._2015.day._1;
+namespace adventofcode.adventofcode.com._2015;
 
 public static class Solution2015day1Extensions
 {
@@ -12,7 +12,7 @@ public static class Solution2015day1Extensions
             .Last().Index + 1;
 }
 
-public class Solution2015day1
+public class Solution2015day0001
 {
     public static long SolvePart1(string input)
         => input

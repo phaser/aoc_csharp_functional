@@ -1,9 +1,22 @@
+using adventofcode.adventofcode.com._2015;
 
-namespace adventofcode.tests.adventofcode.com._2015.day._2;
+namespace adventofcode.tests.adventofcode.com._2015;
 
-public abstract class Input2015day2
+public class Testing2015day0002
 {
-    public const string MainInput = @"20x3x11
+    [TestCase(MainInput, 1606483)]
+    public void TestSolutionPart1(string input, long result)
+    {
+        Solution2015day0002.SolvePart1(input).Should().Be(result);
+    }
+
+    [TestCase(MainInput, 3842356)]
+    public void TestSolutionPart2(string input, long result)
+    {
+        Solution2015day0002.SolvePart2(input).Should().Be(result);
+    }
+
+    private const string MainInput = @"20x3x11
 15x27x5
 6x29x7
 30x15x9
@@ -1003,5 +1016,5 @@ public abstract class Input2015day2
 29x4x8
 21x2x22
 14x12x8
-";
+";    
 }

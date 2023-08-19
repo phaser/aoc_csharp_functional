@@ -18,10 +18,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="adventofcode.com\2015\day\1\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\adventofcode\adventofcode.csproj" />
     </ItemGroup>
 
