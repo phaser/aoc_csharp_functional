@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-var url = "https://adventofcode.com/2015/day/4";
+var url = "https://adventofcode.com/2015/day/5";
 var year = "2015";
 var solutionFolder = GetSolutionFolder();
 var libFolder = Path.Combine(solutionFolder, "adventofcode");
@@ -54,7 +54,7 @@ public class Testing{solutionName}
     {{
     }}
 
-    public const string MainInput = @""{{input}}"";
+    private const string MainInput = @""{{input}}"";
 }}
 ");
 
