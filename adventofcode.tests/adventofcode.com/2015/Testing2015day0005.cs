@@ -11,6 +11,15 @@ public class Testing2015day0005
         Solution2015day0005.SolvePart1(input).Should().Be(answer);
     }
 
+    [TestCase(MainInput, 51)]
+    public void TestSolutionPart2(string input, int answer)
+    {        
+        Solution2015day0005.SolvePart2(input).Should().Be(answer);
+    }
+
+    private const string TestInput1 = @"qjhvhtzxzqqjkmpb
+uurcxstgmygtbstg
+ieodomkazucvgmuy";
     private const string MainInput = @"uxcplgxnkwbdwhrp
 suerykeptdsutidb
 dmrtgdkaimrrwmej
