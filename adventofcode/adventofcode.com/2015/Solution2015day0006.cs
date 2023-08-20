@@ -11,25 +11,6 @@ public enum Command
 
 public static class Solution2015day0006
 {
-    public static int[][] CreateGrid()
-        => new int[1000][]
-            .Select(row => { return row = new int[1000]; }).ToArray();
-
-    public static string[] ParseCommand(this string command)
-        => Regex.Match(command, @"(turn off |turn on |toggle )(\d+),(\d+) through (\d+),(\d+)")
-            .And<Match, string[]>(match =>
-            {
-                if (!match.Success)
-                    throw new ArgumentException("command isn't valid");
-                var result = new string[5];
-                result[0] = match.Groups[1].Value;
-                result[1] = match.Groups[2].Value;
-                result[2] = match.Groups[3].Value;
-                result[3] = match.Groups[4].Value;
-                result[4] = match.Groups[5].Value;
-                return result;
-            });
-
     public static int SolvePart1(string input)
         => CreateGrid()
             .And(grid => SolveInternal(input, grid, (command, value) => command switch
@@ -57,20 +38,43 @@ public static class Solution2015day0006
             .Select(row => row.Aggregate((a, b) => a + b))
             .Aggregate((a, b) => a + b);
 
-    private static int[][] ProcessCommand(string line, int[][] grid, Func<string, int, int> process)
-    {
-        var command = line.ParseCommand();
-        var sx = int.Parse(command[1]);
-        var sy = int.Parse(command[2]);
-        var ex = int.Parse(command[3]);
-        var ey = int.Parse(command[4]);
-        for (int i = sx; i <= ex; i++)
-        {
-            for (int j = sy; j <= ey; j++)
+    private static int[][] CreateGrid()
+        => new int[1000][].Select(_ => new int[1000]).ToArray();
+
+    private static string[] ParseCommand(this string command)
+        => Regex.Match(command, @"(turn off |turn on |toggle )(\d+),(\d+) through (\d+),(\d+)")
+            .And<Match, string[]>(match =>
             {
-                grid[i][j] = process(command[0], grid[i][j]);
-            }
-        }
-        return grid;
-    }
+                if (!match.Success)
+                    throw new ArgumentException("command isn't valid");
+                var result = new string[5];
+                result[0] = match.Groups[1].Value;
+                result[1] = match.Groups[2].Value;
+                result[2] = match.Groups[3].Value;
+                result[3] = match.Groups[4].Value;
+                result[4] = match.Groups[5].Value;
+                return result;
+            });
+
+    private static int[][] ProcessCommand(string line, int[][] grid, Func<string, int, int> process)
+        => line.ParseCommand()
+            .And(pc => new
+            {
+                Cmd = pc[0],
+                sx = int.Parse(pc[1]),
+                sy = int.Parse(pc[2]),
+                ex = int.Parse(pc[3]),
+                ey = int.Parse(pc[4])
+            })
+            .And(pc =>
+            {
+                for (var i = pc.sx; i <= pc.ex; i++)
+                {
+                    for (var j = pc.sy; j <= pc.ey; j++)
+                    {
+                        grid[i][j] = process(pc.Cmd, grid[i][j]);
+                    }
+                }
+                return grid;
+            });
 }
