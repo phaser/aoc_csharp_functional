@@ -1,10 +1,8 @@
-
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace adventofcode.adventofcode.com._2015;
 
-public partial class Solution2015day0008
+public static partial class Solution2015day0008
 {
     public static int SolvePart1(string[] input)
         => GetStringCodeCount(input) - GetInMemoryCount(input);
