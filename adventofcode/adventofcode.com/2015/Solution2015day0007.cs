@@ -6,15 +6,11 @@ namespace adventofcode.adventofcode.com._2015;
 public static class Solution2015day0007
 {
     private record Register(bool IsNumber, int Number, string Reg = "");
-
-    public record Instruction();
-    public record NumberAssignment(int num, string dest) : Instruction;
-
-    private record RegisterAssignment(string reg1, string dest) : Instruction;
-
-    private record UnaryOperation(OpUnaryOperation operation, Register reg1, string dest) : Instruction;
-
-    private record BinaryOperation(OpBinaryOperation operation, Register reg1, Register reg2, string dest) : Instruction;
+    public interface IInstruction { }
+    public record NumberAssignment(int num, string dest) : IInstruction;
+    private record RegisterAssignment(string reg1, string dest) : IInstruction;
+    private record UnaryOperation(OpUnaryOperation operation, Register reg1, string dest) : IInstruction;
+    private record BinaryOperation(OpBinaryOperation operation, Register reg1, Register reg2, string dest) : IInstruction;
 
     private enum OpUnaryOperation
     {
@@ -37,7 +33,7 @@ public static class Solution2015day0007
         OpBinaryOperation.AND.ToString(),
     };
 
-    private record LocalEnvironment(Dictionary<string, int> Environment, List<Instruction> Instructions);
+    private record LocalEnvironment(Dictionary<string, int> Environment, List<IInstruction> Instructions);
     
     public static Dictionary<string, int> CreateEnvironment()
         => new();
@@ -50,12 +46,12 @@ public static class Solution2015day0007
                 : env)
             .And(SolveInternal);
 
-    public static Instruction ParseInstruction(string instruction)
+    public static IInstruction ParseInstruction(string instruction)
         => instruction.Split(' ')
             .And(ia => ia.Length switch
             {
                 3 => char.IsDigit(ia[0][0])
-                    ? new NumberAssignment(int.Parse(ia[0]), ia[2]) as Instruction
+                    ? new NumberAssignment(int.Parse(ia[0]), ia[2]) as IInstruction
                     : new RegisterAssignment(ia[0], ia[2]),
                 4 => new UnaryOperation(ia[0].MapToUnary(), ia[1].MapToRegister(), ia[3]),
                 5 => new BinaryOperation(ia[1].MapToBinary(), ia[0].MapToRegister(), ia[2].MapToRegister(), ia[4]),
@@ -63,61 +59,54 @@ public static class Solution2015day0007
             });
 
     private static int SolveInternal(LocalEnvironment env)
-    {
-        while (!env.Environment.ContainsKey("a") && env.Instructions.Count > 0)
-        {
-            var usableInstructions = env.Instructions.Where(i => IsExecutable(env.Environment, i)).ToList();
-            env.Instructions.RemoveAll(i => IsExecutable(env.Environment, i));
-            foreach (var instruction in usableInstructions)
-                Execute(env.Environment, instruction);
-        }
-        return env.Environment["a"];
-    }
+        => Enumerable.Range(0, int.MaxValue)
+            .TakeWhile(_ =>
+                GetUsableInstructions(env)
+                    .And(usableInstructions => RemoveUsableInstructions(env)
+                        .And(_ => ExecuteUsableInstructions(env, usableInstructions)))
+                    .And(_ => !env.Environment.ContainsKey("a") && env.Instructions.Count > 0))
+            .Aggregate((_, b) => b)
+            .Modify(_ => env.Environment["a"]);
+
+    private static List<dynamic> ExecuteUsableInstructions(LocalEnvironment env, List<IInstruction> usableInstructions)
+        => usableInstructions.Select(i => Execute(env.Environment, i as dynamic)).ToList();
+
+    private static int RemoveUsableInstructions(LocalEnvironment env)
+        => env.Instructions.RemoveAll(i => IsExecutable(env.Environment, i as dynamic));
+
+    private static List<IInstruction> GetUsableInstructions(LocalEnvironment env)
+        => env.Instructions.Where(i => IsExecutable(env.Environment, i as dynamic)).ToList();
 
     private static LocalEnvironment ExecuteNumberAssignments(LocalEnvironment env)
         => env.Instructions.OfType<NumberAssignment>()
             .Select(i => Execute(env.Environment, i))
-            .ToList()
-            .And(_ => env.Modify(e => e.Instructions.RemoveAll(i => i is NumberAssignment)));
+            .ToList() // force iteration
+            .And(_ => RemoveNumberAssignmentInstructions(env));
 
-    private static List<Instruction> ParseInstructions(string input)
-    {
-        var instructions = input
+    private static LocalEnvironment RemoveNumberAssignmentInstructions(LocalEnvironment env)
+        =>  env.Modify(e => e.Instructions.RemoveAll(i => i is NumberAssignment));
+
+    private static List<IInstruction> ParseInstructions(string input)
+        => input
             .Split("\r\n")
             .Select(i => i.Trim())
             .Select(ParseInstruction)
             .ToList();
-        return instructions;
-    }
-
-    private static int Execute(Dictionary<string, int> env, Instruction instruction)
-        => instruction is RegisterAssignment
-            ? Execute(env, (instruction as RegisterAssignment)!)
-            : instruction is UnaryOperation
-                ? Execute(env, (instruction as UnaryOperation)!)
-                : instruction is BinaryOperation
-                    ? Execute(env, (instruction as BinaryOperation)!)
-                    : throw new NotImplementedException($"Is executable for this type {instruction.GetType().Name} isn't supported");
-
 
     private static int Execute(Dictionary<string, int> env, NumberAssignment instruction)
-    {
-        env.Add(instruction.dest, instruction.num);
-        return 0;
-    }
+        => env.TryAdd(instruction.dest, instruction.num)
+            .And(added => added 
+                ? 0 
+                : throw new ArgumentException($"value {instruction.num} for {instruction.dest} couldn't be added"));
 
-    private static int Execute(Dictionary<string, int> env, RegisterAssignment instruction)
+    private static int Execute(IDictionary<string, int> env, RegisterAssignment instruction)
         => env.ContainsKey(instruction.reg1)
-            .And(containsKey =>
-            {
-                if (!containsKey)
-                    throw new ArgumentException(
-                        $"Invalid instruction RegisterAssignment {instruction.reg1} -> {instruction.dest}");
-                env[instruction.dest] = env[instruction.reg1];
-                return 1;
-            });
+            .And(containsKey => containsKey 
+                ? env[instruction.dest] = env[instruction.reg1]
+                : throw new ArgumentException(
+                    $"Invalid instruction RegisterAssignment {instruction.reg1} -> {instruction.dest}"));
 
-    private static int Execute(Dictionary<string, int> env, UnaryOperation instruction)
+    private static int Execute(IDictionary<string, int> env, UnaryOperation instruction)
         => instruction.reg1.IsNumber
             ? env[instruction.dest] = ~instruction.reg1.Number
             : env[instruction.dest] = ~env[instruction.reg1.Reg];
@@ -132,28 +121,19 @@ public static class Solution2015day0007
             OpBinaryOperation.LSHIFT => env[instruction.dest] =
                 instruction.reg1.GetValue(env) << instruction.reg2.GetValue(env),
             OpBinaryOperation.RSHIFT => env[instruction.dest] =
-                instruction.reg1.GetValue(env) >> instruction.reg2.GetValue(env)
+                instruction.reg1.GetValue(env) >> instruction.reg2.GetValue(env),
+            _ => throw new ArgumentOutOfRangeException()
         };
-
-    private static bool IsExecutable(Dictionary<string, int> env, Instruction instruction)
-        => instruction is RegisterAssignment
-            ? IsExecutable(env, (instruction as RegisterAssignment)!)
-            : instruction is UnaryOperation
-                ? IsExecutable(env, (instruction as UnaryOperation)!)
-                : instruction is BinaryOperation
-                    ? IsExecutable(env, (instruction as BinaryOperation)!)
-                    : throw new NotImplementedException(
-                        $"Is executable for this type {instruction.GetType().Name} isn't supported");
-
-    private static bool IsExecutable(Dictionary<string, int> env, RegisterAssignment instruction)
+    
+    private static bool IsExecutable(IReadOnlyDictionary<string, int> env, RegisterAssignment instruction)
         => env.ContainsKey(instruction.reg1);
 
-    private static bool IsExecutable(Dictionary<string, int> env, UnaryOperation instruction)
+    private static bool IsExecutable(IReadOnlyDictionary<string, int> env, UnaryOperation instruction)
         => instruction.reg1.IsNumber || (!instruction.reg1.IsNumber && env.ContainsKey(instruction.reg1.Reg));
 
-    private static bool IsExecutable(Dictionary<string, int> env, BinaryOperation instruction)
-        => (instruction.reg1.IsNumber || (!instruction.reg1.IsNumber && env.ContainsKey(instruction.reg1.Reg)))
-    && (instruction.reg2.IsNumber || (!instruction.reg2.IsNumber && env.ContainsKey(instruction.reg2.Reg)));
+    private static bool IsExecutable(IReadOnlyDictionary<string, int> env, BinaryOperation instruction)
+        =>    (instruction.reg1.IsNumber || (!instruction.reg1.IsNumber && env.ContainsKey(instruction.reg1.Reg)))
+           && (instruction.reg2.IsNumber || (!instruction.reg2.IsNumber && env.ContainsKey(instruction.reg2.Reg)));
     
     private static OpUnaryOperation MapToUnary(this string op)
         => op.Trim() switch
