@@ -1,7 +1,3 @@
-
-using System.Drawing;
-using System.Runtime.CompilerServices;
-
 namespace adventofcode.adventofcode.com._2015;
 
 public class MinMax
