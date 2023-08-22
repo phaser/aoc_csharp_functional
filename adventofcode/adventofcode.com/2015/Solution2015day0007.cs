@@ -1,5 +1,4 @@
-
-using System.Text.RegularExpressions;
+using System.Collections.ObjectModel;
 
 namespace adventofcode.adventofcode.com._2015;
 
@@ -33,7 +32,7 @@ public static class Solution2015day0007
         OpBinaryOperation.AND.ToString(),
     };
 
-    private record LocalEnvironment(Dictionary<string, int> Environment, List<IInstruction> Instructions);
+    private record LocalEnvironment(IReadOnlyDictionary<string, int> Environment, List<IInstruction> Instructions);
     
     public static Dictionary<string, int> CreateEnvironment()
         => new();
@@ -42,7 +41,14 @@ public static class Solution2015day0007
         => new LocalEnvironment(CreateEnvironment(), ParseInstructions(input))
             .And(ExecuteNumberAssignments)
             .And(env => overrideB 
-                ? env.Modify(e => e.Environment["b"] = 16076)
+                ? env with
+                {
+                    Environment = new ReadOnlyDictionary<string, int>(
+                        new Dictionary<string, int>(
+                            env.Environment.AsEnumerable()
+                                .Where(kvp => kvp.Key != "b")
+                                .Append(new KeyValuePair<string, int>("b", 16076)))) 
+                }
                 : env)
             .And(SolveInternal);
 
@@ -63,25 +69,46 @@ public static class Solution2015day0007
             .TakeWhile(_ =>
                 GetUsableInstructions(env)
                     .And(usableInstructions => RemoveUsableInstructions(env)
-                        .And(_ => ExecuteUsableInstructions(env, usableInstructions)))
+                        .And(localEnvironment => ExecuteUsableInstructions(localEnvironment, usableInstructions))
+                        .And(newKeyValuePairs => env = UpdateEnvironment(env, newKeyValuePairs)))
                     .And(_ => !env.Environment.ContainsKey("a") && env.Instructions.Count > 0))
             .Aggregate((_, b) => b)
             .Modify(_ => env.Environment["a"]);
 
-    private static List<dynamic> ExecuteUsableInstructions(LocalEnvironment env, List<IInstruction> usableInstructions)
-        => usableInstructions.Select(i => Execute(env.Environment, i as dynamic)).ToList();
+    private static LocalEnvironment UpdateEnvironment(LocalEnvironment env, IList<KeyValuePair<string, int>> newKeyValuePairs)
+        => env with
+        {
+            Environment = new ReadOnlyDictionary<string, int>(env.Environment
+                .Concat(new Dictionary<string, int>(newKeyValuePairs))
+                .ToDictionary(x => x.Key, x => x.Value))
+        };
 
-    private static int RemoveUsableInstructions(LocalEnvironment env)
-        => env.Instructions.RemoveAll(i => IsExecutable(env.Environment, i as dynamic));
+    private static IList<KeyValuePair<string, int>> ExecuteUsableInstructions(LocalEnvironment env, IEnumerable<IInstruction> usableInstructions)
+        => usableInstructions
+            .Select(i => 
+                Execute(env.Environment, i as dynamic) is KeyValuePair<string, int> 
+                    ? (KeyValuePair<string, int>)Execute(env.Environment, i as dynamic) 
+                    : default)
+            .ToList();
 
-    private static List<IInstruction> GetUsableInstructions(LocalEnvironment env)
-        => env.Instructions.Where(i => IsExecutable(env.Environment, i as dynamic)).ToList();
+    private static LocalEnvironment RemoveUsableInstructions(LocalEnvironment env)
+        => env.Instructions.RemoveAll(i => IsExecutable(env.Environment, i as dynamic))
+            .And(_ => env);
+
+    private static IList<IInstruction> GetUsableInstructions(LocalEnvironment env)
+        => env.Instructions
+            .Where(i => IsExecutable(env.Environment, i as dynamic))
+            .ToList();
 
     private static LocalEnvironment ExecuteNumberAssignments(LocalEnvironment env)
         => env.Instructions.OfType<NumberAssignment>()
-            .Select(i => Execute(env.Environment, i))
-            .ToList() // force iteration
-            .And(_ => RemoveNumberAssignmentInstructions(env));
+            .Select(Execute)
+            .And(newKeyValuePairs => env with
+            {
+                Environment = new ReadOnlyDictionary<string, int>(
+                    new Dictionary<string, int>(newKeyValuePairs))
+            }) 
+            .And(RemoveNumberAssignmentInstructions);
 
     private static LocalEnvironment RemoveNumberAssignmentInstructions(LocalEnvironment env)
         =>  env.Modify(e => e.Instructions.RemoveAll(i => i is NumberAssignment));
@@ -93,35 +120,28 @@ public static class Solution2015day0007
             .Select(ParseInstruction)
             .ToList();
 
-    private static int Execute(Dictionary<string, int> env, NumberAssignment instruction)
-        => env.TryAdd(instruction.dest, instruction.num)
-            .And(added => added 
-                ? 0 
-                : throw new ArgumentException($"value {instruction.num} for {instruction.dest} couldn't be added"));
+    private static KeyValuePair<string, int> Execute(NumberAssignment instruction)
+        => new KeyValuePair<string, int>(instruction.dest, instruction.num);
 
-    private static int Execute(IDictionary<string, int> env, RegisterAssignment instruction)
+    private static KeyValuePair<string, int> Execute(IReadOnlyDictionary<string, int> env, RegisterAssignment instruction)
         => env.ContainsKey(instruction.reg1)
             .And(containsKey => containsKey 
-                ? env[instruction.dest] = env[instruction.reg1]
+                ? new KeyValuePair<string, int>(instruction.dest, env[instruction.reg1])
                 : throw new ArgumentException(
                     $"Invalid instruction RegisterAssignment {instruction.reg1} -> {instruction.dest}"));
 
-    private static int Execute(IDictionary<string, int> env, UnaryOperation instruction)
+    private static KeyValuePair<string, int> Execute(IReadOnlyDictionary<string, int> env, UnaryOperation instruction)
         => instruction.reg1.IsNumber
-            ? env[instruction.dest] = ~instruction.reg1.Number
-            : env[instruction.dest] = ~env[instruction.reg1.Reg];
+            ? new KeyValuePair<string, int>(instruction.dest, ~instruction.reg1.Number)
+            : new KeyValuePair<string, int>(instruction.dest, ~env[instruction.reg1.Reg]);
 
-    private static int Execute(Dictionary<string, int> env, BinaryOperation instruction)
+    private static KeyValuePair<string, int> Execute(IReadOnlyDictionary<string, int> env, BinaryOperation instruction)
         => instruction.operation switch
         {
-            OpBinaryOperation.OR => env[instruction.dest] =
-                instruction.reg1.GetValue(env) | instruction.reg2.GetValue(env),
-            OpBinaryOperation.AND => env[instruction.dest] =
-                instruction.reg1.GetValue(env) & instruction.reg2.GetValue(env),
-            OpBinaryOperation.LSHIFT => env[instruction.dest] =
-                instruction.reg1.GetValue(env) << instruction.reg2.GetValue(env),
-            OpBinaryOperation.RSHIFT => env[instruction.dest] =
-                instruction.reg1.GetValue(env) >> instruction.reg2.GetValue(env),
+            OpBinaryOperation.OR => new KeyValuePair<string, int>(instruction.dest, instruction.reg1.GetValue(env) | instruction.reg2.GetValue(env)),
+            OpBinaryOperation.AND => new KeyValuePair<string, int>(instruction.dest, instruction.reg1.GetValue(env) & instruction.reg2.GetValue(env)),
+            OpBinaryOperation.LSHIFT => new KeyValuePair<string, int>(instruction.dest, instruction.reg1.GetValue(env) << instruction.reg2.GetValue(env)),
+            OpBinaryOperation.RSHIFT => new KeyValuePair<string, int>(instruction.dest, instruction.reg1.GetValue(env) >> instruction.reg2.GetValue(env)),
             _ => throw new ArgumentOutOfRangeException()
         };
     
@@ -157,7 +177,7 @@ public static class Solution2015day0007
             ? new Register(true, regValue)
             : new Register(false, 0, reg);
 
-    private static int GetValue(this Register reg, Dictionary<string, int> env)
+    private static int GetValue(this Register reg, IReadOnlyDictionary<string, int> env)
         => reg.IsNumber
             ? reg.Number
             : env[reg.Reg];

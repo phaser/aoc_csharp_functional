@@ -21,4 +21,20 @@
       <ProjectReference Include="..\adventofcode\adventofcode.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <None Update="adventofcode.com\2015\Assets\Testing2015day0008Input.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="adventofcode.com\2015\Assets\Testing2015day0008TestInput.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="adventofcode.com\2015\Assets\Testing2015day0008TestInput.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Compile>
+    </ItemGroup>
+
 </Project>
