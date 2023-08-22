@@ -1,6 +1,3 @@
-
-using System.Text.RegularExpressions;
-
 namespace adventofcode.adventofcode.com._2015;
 
 public static class Solution2015day0007
