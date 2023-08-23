@@ -13,28 +13,29 @@ public static partial class Solution2015day0009
             {
                 r.Sort((a, b) => a.Distance < b.Distance ? -1 : a.Distance == b.Distance ? 0 : 1);
             }))
-            .And(SolveInternal);
+            .And(routes => SolveInternal(routes).Min());
 
-    private static int SolveInternal(IList<Route> routes)
-    {
-        var link = new List<Route>();
-        link.Add(routes.First());
-        routes.RemoveAt(0);
-        while (routes.Count > 0)
-        {
-            var newRoute = routes.First(r => r.City1 == link[0].City1
-                                       || r.City1 == link[0].City2
-                                       || r.City2 == link[0].City1
-                                       || r.City2 == link[0].City2);
-            link.Add(newRoute);
-            routes.Remove(newRoute);
-        }
-        return link.Select(r => r.Distance)
-            .Aggregate((a, b) => a + b);
-    }
+    public static int SolvePart2(string input)
+        => ParseInput(input)
+            .And(routes => routes.Modify(r =>
+            {
+                r.Sort((a, b) => a.Distance < b.Distance ? -1 : a.Distance == b.Distance ? 0 : 1);
+            }))
+            .And(routes => SolveInternal(routes).Max());
 
+    private static IEnumerable<int> SolveInternal(IList<Route> routes)
+        => routes
+            .SelectMany(route => new List<string>(2) { route.City1, route.City2 }.AsEnumerable())
+            .Distinct()
+            .ToArray()
+            .Permutations()
+            .Select(p => p.Zip(p.Skip(1), (a, b) => routes.First(
+                    r => (r.City1 == a && r.City2 == b)
+                         || (r.City1 == b && r.City2 == a)).Distance)
+                .Aggregate((a, b) => a + b));
+    
     private static List<Route> ParseInput(string input)
-    => input
+        => input
             .Split('\n')
             .Select(line => line.Trim())
             .Select(line =>

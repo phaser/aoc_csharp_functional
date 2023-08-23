@@ -6,11 +6,18 @@ namespace adventofcode.tests.adventofcode.com._2015;
 public class Testing2015day0009
 {
     [TestCase(TestInput1, 605)]
-    public void TestSolution(string input, int distance)
+    [TestCase(MainInput, 117)]
+    public void TestSolutionPart1(string input, int distance)
     {
         Solution2015day0009.SolvePart1(input).Should().Be(distance);
     }
 
+    [TestCase(MainInput, 909)]
+    public void TestSolutionPart2(string input, int distance)
+    {
+        Solution2015day0009.SolvePart2(input).Should().Be(distance);
+    }
+    
     private const string TestInput1 = @"London to Dublin = 464
 London to Belfast = 518
 Dublin to Belfast = 141";
