@@ -5,8 +5,6 @@ namespace adventofcode.adventofcode.com._2015;
 
 public static partial class Solution2015day0010
 {
-    private const double ConwayConstant = 1.3;
-
     private static string LookAndSay(this string input)
         => string.Concat(
             MyRegex().Match(input)
