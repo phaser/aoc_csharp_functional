@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-
-namespace adventofcode;
+﻿namespace adventofcode;
 
 public static class PermutationsExtensions
 {
