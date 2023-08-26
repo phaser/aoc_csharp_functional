@@ -29,6 +29,9 @@
       <None Update="adventofcode.com\2015\Assets\Testing2015day0008TestInput.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="adventofcode.com\2015\Assets\Testing2015day0012Input.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
