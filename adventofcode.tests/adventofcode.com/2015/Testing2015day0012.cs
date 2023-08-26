@@ -21,8 +21,7 @@ public class Testing2015day0012
     public void TestSolutionPart2()
     {
         var input = LoadInput();
-        var json = JsonSerializer.Deserialize<ExpandoObject>(input);
-        var fo = json.Select(c => c.Value as ExpandoObject).ToList();
+        Solution2015day0012.SolvePart2(input).Should().Be(65402);
     }
 
     private static string LoadInput()
@@ -31,6 +30,4 @@ public class Testing2015day0012
             "adventofcode.com/2015/Assets/Testing2015day0012Input.txt"));
         return input;
     }
-    
-    private const string MainInput = @"{input}";
 }
