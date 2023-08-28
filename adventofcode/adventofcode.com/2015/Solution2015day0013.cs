@@ -44,7 +44,7 @@ public static partial class Solution2015day0013
         => state with
         {
             Participants = state.Relations
-                .SelectMany(r => new[] {r.Character, r.GainsFrom })
+                .SelectMany(r => new[] {r.Character, r.GainsFrom})
                 .Distinct().ToList()
         };
 
