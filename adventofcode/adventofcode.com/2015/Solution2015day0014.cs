@@ -3,57 +3,68 @@ using System.Text.RegularExpressions;
 
 namespace adventofcode.adventofcode.com._2015;
 
-public static class Solution2015day0014
+public static partial class Solution2015day0014
 {
-    public record RainDeer(string Name, bool IsResting, int UntilStateChange, int MaxRun, int MaxRest, int DistPerSecond, int Acc, int Pp);
+    public record RainDeer(string Name, bool IsResting, int UntilStateChange, int MaxRun, int MaxRest, int DistPerSecond, int AccumulatedDistance, int WinningPoints);
 
-    public record Race(List<RainDeer> Raindeers);
+    private record Race(List<RainDeer> Raindeers);
 
+    // part 1 was done with pen & paper
+    
     public static int SolvePart2(string input, int duration)
         => input.Split('\n').Select(s => s.Trim())
-            .Select(l => Regex.Match(l, @"(?<name>[a-zA-Z]+) can fly (?<speed>[0-9]+) km\/s for (?<speedburst>[0-9]+) seconds, but then must rest for (?<rest>[0-9]+) seconds.")
-                .And(match => new RainDeer(
-                    match.Groups["name"].Value,
-                    false, 
-                    int.Parse(match.Groups["speedburst"].Value),
-                    int.Parse(match.Groups["speedburst"].Value),
-                    int.Parse(match.Groups["rest"].Value),
-                            int.Parse(match.Groups["speed"].Value),
-                    0, 0)))
+            .Select(ParseInput)
             .And(raindeers => new Race(raindeers.ToList()))
             .And(race => EvalState(race, duration))
-            .And(l => l.Raindeers.MaxBy(ra => ra.Pp)!.Pp);
+            .And(l => l.Raindeers.MaxBy(ra => ra.WinningPoints)!.WinningPoints);
+
+    private static RainDeer ParseInput(string l)
+        => ParseInputRegex().Match(l)
+            .And(match => new RainDeer(
+                Name: match.Groups["name"].Value,
+                IsResting: false, 
+                UntilStateChange: int.Parse(match.Groups["speedburst"].Value),
+                MaxRun: int.Parse(match.Groups["speedburst"].Value),
+                MaxRest: int.Parse(match.Groups["rest"].Value),
+                DistPerSecond: int.Parse(match.Groups["speed"].Value),
+                AccumulatedDistance: 0, 
+                WinningPoints: 0));
 
     private static Race EvalState(Race race, int duration)
-    {
-        while (true)
-        {
-            if (duration == 0) return race;
-
-            var newRace = race with
+        => Enumerable.Range(0, duration)
+            .Select(_ =>
             {
-                Raindeers = race.Raindeers
-                    .Select(rd => rd with {
-                        Acc = rd.Acc + (rd.IsResting ? 0 : rd.DistPerSecond),
-                        IsResting = (rd.UntilStateChange - 1 == 0 ? !rd.IsResting : rd.IsResting),
-                        UntilStateChange = (rd.UntilStateChange - 1 == 0
-                            ? rd.IsResting ? rd.MaxRun : rd.MaxRest
-                            : (rd.UntilStateChange - 1)) 
-                    }).ToList()
-                    .And(raindeers => raindeers.Select(r => r.Acc).Max()
-                        .And(max => raindeers.Where(r => r.Acc < max)
-                            .ToList()
-                            .And(list => 
+                race = race with
+                {
+                    Raindeers = race.Raindeers
+                        .Select(UpdateDistanceTravelled).ToList()
+                        .And(AwardWinningPoints)
+                };
+                return race;
+            }).ToList().Last();
+
+    private static List<RainDeer> AwardWinningPoints(List<RainDeer> raindeers)
+        => raindeers.Select(r => r.AccumulatedDistance).Max()
+                .And(max => raindeers.Where(r => r.AccumulatedDistance < max)
+                    .ToList()
+                    .And(list => list.Modify(ls => 
+                        ls.AddRange(raindeers
+                            .Where(r => r.AccumulatedDistance == max)
+                            .Select(r => r with 
                             { 
-                                list.AddRange(raindeers.Where(r => r.Acc == max).Select(r => r with 
-                                { 
-                                    Pp = r.Pp + 1 
-                                })); 
-                                return list; 
-                            })))
+                                WinningPoints = r.WinningPoints + 1 
+                            })))));
+
+    private static RainDeer UpdateDistanceTravelled(RainDeer rd)
+        => rd with
+            {
+                AccumulatedDistance = rd.AccumulatedDistance + (rd.IsResting ? 0 : rd.DistPerSecond),
+                IsResting = rd.UntilStateChange - 1 == 0 ? !rd.IsResting : rd.IsResting,
+                UntilStateChange = rd.UntilStateChange - 1 == 0
+                    ? rd.IsResting ? rd.MaxRun : rd.MaxRest
+                    : rd.UntilStateChange - 1
             };
-            race = newRace;
-            duration = duration - 1;
-        }
-    }
+    
+    [GeneratedRegex("(?<name>[a-zA-Z]+) can fly (?<speed>[0-9]+) km\\/s for (?<speedburst>[0-9]+) seconds, but then must rest for (?<rest>[0-9]+) seconds.")]
+    private static partial Regex ParseInputRegex();
 }
