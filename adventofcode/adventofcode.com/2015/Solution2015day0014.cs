@@ -32,16 +32,12 @@ public static partial class Solution2015day0014
 
     private static Race EvalState(Race race, int duration)
         => Enumerable.Range(0, duration)
-            .Select(_ =>
-            {
-                race = race with
-                {
-                    Raindeers = race.Raindeers
-                        .Select(UpdateDistanceTravelled).ToList()
-                        .And(AwardWinningPoints)
-                };
-                return race;
-            }).ToList().Last();
+            .Select(_ => new Race(Raindeers: race.Raindeers
+                    .Select(UpdateDistanceTravelled)
+                    .ToList()
+                    .And(AwardWinningPoints)))
+            .ToList()
+            .Last();
 
     private static List<RainDeer> AwardWinningPoints(List<RainDeer> raindeers)
         => raindeers.Select(r => r.AccumulatedDistance).Max()
