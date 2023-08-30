@@ -118,7 +118,8 @@ public record BoardCache
 public static class Solution2015day0018
 {
     public static int SolvePart1(string input, int steps)
-        => input.Parse()
+        => input
+            .Parse()
             .And(board => SolvePart1Internal(board, steps, new BoardCache(board.Width, board.Height)));
 
     private static Board Parse(this string input)
@@ -133,25 +134,32 @@ public static class Solution2015day0018
 
     private static int SolvePart1Internal(Board currentBoard, int steps, BoardCache cache)
         => Enumerable.Range(0, steps)
-            .Select(step => cache.Get()
-                    .And(newBoard =>
-                            {
-                                var latestBoard = (currentBoard.Width, currentBoard.Height)
-                                    .CrossRange()
-                                    .Select(v => newBoard.Set(v.x, v.y, currentBoard.Get(v.x, v.y) != 0
-                                        ? currentBoard.GetNeighbors(v.Item1, v.Item2).Count(n => n != 0) is 2 or 3
-                                            ? 1
-                                            : 0
-                                        : currentBoard.GetNeighbors(v.Item1, v.Item2).Count(n => n != 0) == 3
-                                            ? 1
-                                            : 0))
-                                    .Aggregate((a, b) => b);
-                                currentBoard.Copy(latestBoard);
-                                cache.Return(latestBoard);
-                                return step;
-                            }
-                        ))
+            .Select(step => ComputeNewStep(currentBoard, cache, GetNewCellValue))
             .Aggregate((a, b) => b)
-            .And(_ => (currentBoard.Width, currentBoard.Height).CrossRange().Count(e => currentBoard.Get(e.x, e.y) != 0));
+            .And(_ => CountOnLights(currentBoard));
 
+    private static int CountOnLights(Board currentBoard) 
+        => (currentBoard.Width, currentBoard.Height).CrossRange().Count(e => currentBoard.Get(e.x, e.y) != 0);
+
+    private static int ComputeNewStep(Board currentBoard, BoardCache cache, Func<Board, (int x, int y), int> getNewCellValue) 
+        => cache.Get()
+            .And(newBoard => (currentBoard.Width, currentBoard.Height)
+                .CrossRange()
+                .Select(v => newBoard.Set(v.x, v.y, getNewCellValue(currentBoard, v)))
+                .Aggregate((a, b) => b)
+                .Modify(latestBoard =>
+                {
+                    currentBoard.Copy(latestBoard);
+                    cache.Return(latestBoard);
+                }))
+            .And(_ => 0);
+
+    private static int GetNewCellValue(Board currentBoard, (int x, int y) v) 
+        => currentBoard.Get(v.x, v.y) != 0 ? GetLightOnValue(currentBoard, v) : GetLightOffValue(currentBoard, v);
+
+    private static int GetLightOffValue(Board currentBoard, (int x, int y) v)
+        => currentBoard.GetNeighbors(v.x, v.y).Count(n => n != 0) == 3 ? 1 : 0;
+
+    private static int GetLightOnValue(Board currentBoard, (int x, int y) v)
+        => currentBoard.GetNeighbors(v.x, v.y).Count(n => n != 0) is 2 or 3 ? 1 : 0;
 }
