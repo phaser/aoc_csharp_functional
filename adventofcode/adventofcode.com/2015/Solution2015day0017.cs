@@ -33,7 +33,8 @@ public static class Solution2015day0017
                     Combo: com,
                     Sum: com.GetBits(containers.Count)
                         .Zip(containers, (a, b) => a * b)
-                        .Sum()))
+                        .Sum()
+                    ))
             .Where(s => s.Sum == quantity);
 
     private static List<int> Parse(this string input) 
