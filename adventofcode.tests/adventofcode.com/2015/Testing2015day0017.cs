@@ -7,9 +7,16 @@ public class Testing2015day0017
 {
     [TestCase(Testing, 25, 4)]
     [TestCase(MainInput, 150, 654)]
-    public void TestSolution(string input, int quantity, int expectedResult)
+    public void TestSolutionPart1(string input, int quantity, int expectedResult)
     {
         Solution2015day0017.SolvePart1(input, quantity).Should().Be(expectedResult);
+    }
+
+    [TestCase(Testing, 25, 3)]
+    [TestCase(MainInput, 150, 57)]
+    public void TestSolutionPart2(string input, int quantity, int expectedResult)
+    {
+        Solution2015day0017.SolvePart2(input, quantity).Should().Be(expectedResult);
     }
 
     private const string Testing = @"20
