@@ -15,11 +15,10 @@ public static class Solution2015day0017
         => input
             .Parse()
             .And(containers => ComputeMatchingBarrelCombinations(quantity, containers))
-            .ToList()
             .And(FilterMinBarrelCombinations)
             .Count();
 
-    private static IEnumerable<Combination> FilterMinBarrelCombinations(List<Combination> configurations)
+    private static IEnumerable<Combination> FilterMinBarrelCombinations(IEnumerable<Combination> configurations)
         => configurations
             .MinBy(c => c.Sum)!
             .Combo.GetBits(32).Count(b => b == 1)
@@ -34,7 +33,8 @@ public static class Solution2015day0017
                     Combo: com,
                     Sum: com.GetBits(containers.Count)
                         .Zip(containers, (a, b) => a * b)
-                        .Sum()))
+                        .Sum()
+                    ))
             .Where(s => s.Sum == quantity);
 
     private static List<int> Parse(this string input) 
