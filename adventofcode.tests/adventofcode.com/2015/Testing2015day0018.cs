@@ -12,6 +12,13 @@ public class Testing2015day0018
         Solution2015day0018.SolvePart1(input, steps).Should().Be(expectedResult);
     }
 
+    [TestCase(TestInputPart2, 5, 17)]
+    [TestCase(MainInput, 100, 886)]
+    public void TestSolutionPart2(string input, int steps, int expectedResult)
+    {
+        Solution2015day0018.SolvePart2(input, steps).Should().Be(expectedResult);
+    }
+
     [TestCase]
     public void TestBoardImplementation()
     {
@@ -35,6 +42,13 @@ public class Testing2015day0018
         board.GetNeighbors(2, 67).Any(n => n == 977).Should().BeTrue();
     }
 
+    private const string TestInputPart2 = @"##.#.#
+...##.
+#....#
+..#...
+#.#..#
+####.#";
+    
     private const string TestInput = @".#.#.#
 ...##.
 #....#
