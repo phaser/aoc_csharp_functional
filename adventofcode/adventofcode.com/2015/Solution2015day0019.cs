@@ -10,14 +10,15 @@ public static partial class Solution2015day0019
         => input.Parse()
             .And(data => 
                 data.Rules.SelectMany(rule =>
-                    Regex.Matches(data.MedicineMolecule, $"{rule.Key}")
-                        .And(matches => matches
-                            .Select(match =>
-                                data.MedicineMolecule[..match.Index] +
-                                rule.Value +
-                                data.MedicineMolecule[(match.Index + match.Length)..])))
-                    .Distinct()
-                    .Count());
+                    Regex
+                        .Matches(data.MedicineMolecule, $"{rule.Key}")
+                        .And(matches => matches.Select(match => 
+                            match.Fork(
+                                strings => string.Join("", strings.First(), rule.Value, strings.Last()), 
+                                m => data.MedicineMolecule[..m.Index], 
+                                m => data.MedicineMolecule[(m.Index + m.Length)..])))))
+            .Distinct()
+            .Count();
 
     private static (string MedicineMolecule, ImmutableList<KeyValuePair<string, string>> Rules) Parse(this string input)
         => input.Split('\n').Select(l => l.Trim())
