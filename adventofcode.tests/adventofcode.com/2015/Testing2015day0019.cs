@@ -13,7 +13,7 @@ public class Testing2015day0019
     }
 
     [TestCase(TestInput2, 3)]
-    [TestCase(MainInput, 3)]
+    [TestCase(MainInput, 195)]
     public void TestSolutionPart2(string input, long expectedValue)
     {
         Solution2015day0019.SolvePart2(input).Should().Be(expectedValue);
