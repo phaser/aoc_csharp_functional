@@ -9,7 +9,7 @@ public static partial class Solution2015day0009
 
     public static int SolvePart1(string input)
         => ParseInput(input)
-            .And(routes => routes.Modify(r =>
+            .And(routes => routes.Tap(r =>
             {
                 r.Sort((a, b) => a.Distance < b.Distance ? -1 : a.Distance == b.Distance ? 0 : 1);
             }))
@@ -17,7 +17,7 @@ public static partial class Solution2015day0009
 
     public static int SolvePart2(string input)
         => ParseInput(input)
-            .And(routes => routes.Modify(r =>
+            .And(routes => routes.Tap(r =>
             {
                 r.Sort((a, b) => a.Distance < b.Distance ? -1 : a.Distance == b.Distance ? 0 : 1);
             }))

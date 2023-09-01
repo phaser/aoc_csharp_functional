@@ -1,5 +1,3 @@
-
-using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace adventofcode.adventofcode.com._2015;

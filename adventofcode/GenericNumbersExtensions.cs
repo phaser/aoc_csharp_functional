@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace adventofcode;
+﻿namespace adventofcode;
 
 public static class GenericNumbersExtensions
 {

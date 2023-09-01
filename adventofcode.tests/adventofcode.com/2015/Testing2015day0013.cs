@@ -1,6 +1,5 @@
 
 using adventofcode.adventofcode.com._2015;
-using NUnit.Framework.Internal;
 
 namespace adventofcode.tests.adventofcode.com._2015;
 
