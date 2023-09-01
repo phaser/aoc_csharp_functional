@@ -73,7 +73,7 @@ public static class Solution2015day0007
                         .And(newKeyValuePairs => env = UpdateEnvironment(env, newKeyValuePairs)))
                     .And(_ => !env.Environment.ContainsKey("a") && env.Instructions.Count > 0))
             .Aggregate((_, b) => b)
-            .Modify(_ => env.Environment["a"]);
+            .Tap(_ => env.Environment["a"]);
 
     private static LocalEnvironment UpdateEnvironment(LocalEnvironment env, IList<KeyValuePair<string, int>> newKeyValuePairs)
         => env with
@@ -111,7 +111,7 @@ public static class Solution2015day0007
             .And(RemoveNumberAssignmentInstructions);
 
     private static LocalEnvironment RemoveNumberAssignmentInstructions(LocalEnvironment env)
-        =>  env.Modify(e => e.Instructions.RemoveAll(i => i is NumberAssignment));
+        =>  env.Tap(e => e.Instructions.RemoveAll(i => i is NumberAssignment));
 
     private static List<IInstruction> ParseInstructions(string input)
         => input

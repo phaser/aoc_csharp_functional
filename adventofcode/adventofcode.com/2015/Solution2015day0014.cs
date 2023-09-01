@@ -43,7 +43,7 @@ public static partial class Solution2015day0014
         => raindeers.Select(r => r.AccumulatedDistance).Max()
                 .And(max => raindeers.Where(r => r.AccumulatedDistance < max)
                     .ToList()
-                    .And(list => list.Modify(ls => 
+                    .And(list => list.Tap(ls => 
                         ls.AddRange(raindeers
                             .Where(r => r.AccumulatedDistance == max)
                             .Select(r => r with 

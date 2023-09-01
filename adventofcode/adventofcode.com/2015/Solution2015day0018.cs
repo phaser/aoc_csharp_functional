@@ -40,7 +40,7 @@ public static class Solution2015day0018
             .And(_ => CountOnLights(currentBoard));
 
     private static Board SetFourCornersOn(Board currentBoard)
-        => currentBoard.Modify(cb =>
+        => currentBoard.Tap(cb =>
         {
             cb.Set(0, 0, 1);
             cb.Set(0, cb.Height - 1, 1);
@@ -57,7 +57,7 @@ public static class Solution2015day0018
                 .CrossRange()
                 .Select(v => newBoard.Set(v.x, v.y, getNewCellValue(currentBoard, v)))
                 .Aggregate((a, b) => b)
-                .Modify(latestBoard =>
+                .Tap(latestBoard =>
                 {
                     currentBoard.Copy(latestBoard);
                     cache.Return(latestBoard);

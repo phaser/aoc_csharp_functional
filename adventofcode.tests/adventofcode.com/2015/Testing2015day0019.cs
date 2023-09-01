@@ -12,6 +12,21 @@ public class Testing2015day0019
         Solution2015day0019.SolvePart1(input).Should().Be(expectedValue);
     }
 
+    [TestCase(TestInput2, 3)]
+    [TestCase(MainInput, 3)]
+    public void TestSolutionPart2(string input, long expectedValue)
+    {
+        Solution2015day0019.SolvePart2(input).Should().Be(expectedValue);
+    }
+
+    private const string TestInput2 = @"e => H
+e => O
+H => HO
+H => OH
+O => HH
+
+HOH";
+    
     private const string TestInput = @"H => HO
 H => OH
 O => HH
