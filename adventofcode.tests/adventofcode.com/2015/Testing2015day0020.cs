@@ -10,4 +10,10 @@ public class Testing2015day0020
     {
         Solution2015day0020.SolvePart1(33100000).Should().Be(776160);
     }
+
+    [TestCase]
+    public void TestSolutionPart1Iterative()
+    {
+        Solution2015day0020.SolvePart1Iterative(33100000).Should().Be(776160);
+    }
 }
