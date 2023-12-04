@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-var url = "https://adventofcode.com/2023/day/1";
+var url = "https://adventofcode.com/2023/day/3";
 var year = "2023";
 var solutionFolder = GetSolutionFolder();
 var libFolder = Path.Combine(solutionFolder, "adventofcode");
