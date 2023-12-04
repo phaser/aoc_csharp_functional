@@ -6,28 +6,6 @@ namespace adventofcode.adventofcode.com._2023;
 
 public class Solution2023day0001
 {
-    private static readonly Dictionary<string, string> Replacements = new()
-    {
-        { "one",   "1" },
-        { "two",   "2" },
-        { "three", "3" },
-        { "four",  "4" },
-        { "five",  "5" },
-        { "six",   "6" },
-        { "seven", "7" },
-        { "eight", "8" },
-        { "nine",  "9" },
-        { "1", "1" },
-        { "2", "2" },
-        { "3", "3" },
-        { "4", "4" },
-        { "5", "5" },
-        { "6", "6" },
-        { "7", "7" },
-        { "8", "8" },
-        { "9", "9" },
-    };
-    
     public static long SolveDay1A(string input)
         => input.Split("\n")
             .Select(line =>
