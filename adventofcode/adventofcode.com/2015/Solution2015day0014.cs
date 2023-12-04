@@ -14,13 +14,13 @@ public static partial class Solution2015day0014
     public static int SolvePart2(string input, int duration)
         => input.Split('\n').Select(s => s.Trim())
             .Select(ParseInput)
-            .And(raindeers => new Race(raindeers.ToList()))
-            .And(race => EvalState(race, duration))
-            .And(l => l.Raindeers.MaxBy(ra => ra.WinningPoints)!.WinningPoints);
+            .Map(raindeers => new Race(raindeers.ToList()))
+            .Map(race => EvalState(race, duration))
+            .Map(l => l.Raindeers.MaxBy(ra => ra.WinningPoints)!.WinningPoints);
 
     private static RainDeer ParseInput(string l)
         => ParseInputRegex().Match(l)
-            .And(match => new RainDeer(
+            .Map(match => new RainDeer(
                 Name: match.Groups["name"].Value,
                 IsResting: false, 
                 UntilStateChange: int.Parse(match.Groups["speedburst"].Value),
@@ -35,15 +35,15 @@ public static partial class Solution2015day0014
             .Select(_ => new Race(Raindeers: race.Raindeers
                     .Select(UpdateDistanceTravelled)
                     .ToList()
-                    .And(AwardWinningPoints)))
+                    .Map(AwardWinningPoints)))
             .ToList()
             .Last();
 
     private static List<RainDeer> AwardWinningPoints(List<RainDeer> raindeers)
         => raindeers.Select(r => r.AccumulatedDistance).Max()
-                .And(max => raindeers.Where(r => r.AccumulatedDistance < max)
+                .Map(max => raindeers.Where(r => r.AccumulatedDistance < max)
                     .ToList()
-                    .And(list => list.Tap(ls => 
+                    .Map(list => list.Tap(ls => 
                         ls.AddRange(raindeers
                             .Where(r => r.AccumulatedDistance == max)
                             .Select(r => r with 

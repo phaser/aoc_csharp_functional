@@ -11,7 +11,7 @@ public static class Solution2015day0016
 
     public static int SolvePart1(string input)
         => ParseInput(input)
-            .And(list => list.Select(e => new
+            .Map(list => list.Select(e => new
                 {
                     Sue = e, Score =
                         (e.Features.Any(f => f is { Name: "children", Value: 3 }) ? 1 : 0) +
@@ -29,7 +29,7 @@ public static class Solution2015day0016
 
     public static int SolvePart2(string input)
         => ParseInput(input)
-            .And(list => list.Select(e => new
+            .Map(list => list.Select(e => new
                 {
                     Sue = e, Score =
                         (e.Features.Any(f => f is { Name: "children", Value: 3 }) ? 1 : 0) +
@@ -48,8 +48,7 @@ public static class Solution2015day0016
     private static List<Sue> ParseInput(string input)
         => input.Split('\n').Select(l => l.Trim())
             .Select(l => Regex.Match(l, @"Sue (?<id>[0-9]+):(( ?(?<feature>[a-z]+): (?<feature_value>[0-9]+),?)\2*)+")
-                .And(match => match.Groups["feature"].Captures.Zip(match.Groups["feature_value"].Captures,
-                    (a, b) => new Feature(a.Value, b.Value.ToInt())).ToList()
-                    .And(features => new Sue(match.Groups["id"].Value.ToInt(), features))))
+                .Map(match => FunctionalExtensions.Map(match.Groups["feature"].Captures.Zip(match.Groups["feature_value"].Captures,
+                        (a, b) => new Feature(a.Value, b.Value.ToInt())).ToList(), features => new Sue(match.Groups["id"].Value.ToInt(), features))))
             .ToList();
 }

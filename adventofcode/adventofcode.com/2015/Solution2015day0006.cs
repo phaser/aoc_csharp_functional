@@ -13,7 +13,7 @@ public static class Solution2015day0006
 {
     public static int SolvePart1(string input)
         => CreateGrid()
-            .And(grid => SolveInternal(input, grid, (command, value) => command switch
+            .Map(grid => SolveInternal(input, grid, (command, value) => command switch
             {
                 "turn on " => 1,
                 "turn off " => 0,
@@ -23,7 +23,7 @@ public static class Solution2015day0006
 
     public static int SolvePart2(string input)
         => CreateGrid()
-            .And(grid => SolveInternal(input, grid, (command, value) => command switch
+            .Map(grid => SolveInternal(input, grid, (command, value) => command switch
             {
                 "turn on " => value + 1,
                 "turn off " => value > 0 ? value - 1 : value,
@@ -43,7 +43,7 @@ public static class Solution2015day0006
 
     private static string[] ParseCommand(this string command)
         => Regex.Match(command, @"(turn off |turn on |toggle )(\d+),(\d+) through (\d+),(\d+)")
-            .And<Match, string[]>(match =>
+            .Map<Match, string[]>(match =>
             {
                 if (!match.Success)
                     throw new ArgumentException("command isn't valid");
@@ -58,7 +58,7 @@ public static class Solution2015day0006
 
     private static int[][] ProcessCommand(string line, int[][] grid, Func<string, int, int> process)
         => line.ParseCommand()
-            .And(pc => new
+            .Map(pc => new
             {
                 Cmd = pc[0],
                 sx = int.Parse(pc[1]),
@@ -66,7 +66,7 @@ public static class Solution2015day0006
                 ex = int.Parse(pc[3]),
                 ey = int.Parse(pc[4])
             })
-            .And(pc =>
+            .Map(pc =>
             {
                 for (var i = pc.sx; i <= pc.ex; i++)
                 {

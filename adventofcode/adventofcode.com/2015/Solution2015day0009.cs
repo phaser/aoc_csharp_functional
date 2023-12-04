@@ -9,19 +9,19 @@ public static partial class Solution2015day0009
 
     public static int SolvePart1(string input)
         => ParseInput(input)
-            .And(routes => routes.Tap(r =>
+            .Map(routes => routes.Tap(r =>
             {
                 r.Sort((a, b) => a.Distance < b.Distance ? -1 : a.Distance == b.Distance ? 0 : 1);
             }))
-            .And(routes => SolveInternal(routes).Min());
+            .Map(routes => SolveInternal(routes).Min());
 
     public static int SolvePart2(string input)
         => ParseInput(input)
-            .And(routes => routes.Tap(r =>
+            .Map(routes => routes.Tap(r =>
             {
                 r.Sort((a, b) => a.Distance < b.Distance ? -1 : a.Distance == b.Distance ? 0 : 1);
             }))
-            .And(routes => SolveInternal(routes).Max());
+            .Map(routes => SolveInternal(routes).Max());
 
     private static IEnumerable<int> SolveInternal(IList<Route> routes)
         => routes
@@ -40,7 +40,7 @@ public static partial class Solution2015day0009
             .Select(line => line.Trim())
             .Select(line =>
                 InputFormatRegex().Match(line)
-                    .And(match => match.Success
+                    .Map(match => match.Success
                         ? new Route(match.Groups["city1"].Value.Trim(), match.Groups["city2"].Value.Trim(),
                             int.Parse(match.Groups["distance"].Value))
                         : throw new ArgumentException("Invalid input")))

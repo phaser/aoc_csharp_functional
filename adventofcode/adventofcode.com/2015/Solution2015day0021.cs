@@ -90,5 +90,5 @@ public static class Solution2015day0021
                 return player.HitPoints > 0 && boss.HitPoints > 0;
             })
             .Aggregate((_, b) => b)
-            .And(_ => player.HitPoints > 0 ? 0 : 1);
+            .Map(_ => player.HitPoints > 0 ? 0 : 1);
 }

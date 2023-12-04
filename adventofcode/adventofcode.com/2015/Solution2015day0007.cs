@@ -39,8 +39,8 @@ public static class Solution2015day0007
 
     public static int Solve(string input, bool overrideB = false)
         => new LocalEnvironment(CreateEnvironment(), ParseInstructions(input))
-            .And(ExecuteNumberAssignments)
-            .And(env => overrideB 
+            .Map(ExecuteNumberAssignments)
+            .Map(env => overrideB 
                 ? env with
                 {
                     Environment = new ReadOnlyDictionary<string, int>(
@@ -50,11 +50,11 @@ public static class Solution2015day0007
                                 .Append(new KeyValuePair<string, int>("b", 16076)))) 
                 }
                 : env)
-            .And(SolveInternal);
+            .Map(SolveInternal);
 
     public static IInstruction ParseInstruction(string instruction)
         => instruction.Split(' ')
-            .And(ia => ia.Length switch
+            .Map(ia => ia.Length switch
             {
                 3 => char.IsDigit(ia[0][0])
                     ? new NumberAssignment(int.Parse(ia[0]), ia[2]) as IInstruction
@@ -68,10 +68,10 @@ public static class Solution2015day0007
         => Enumerable.Range(0, int.MaxValue)
             .TakeWhile(_ =>
                 GetUsableInstructions(env)
-                    .And(usableInstructions => RemoveUsableInstructions(env)
-                        .And(localEnvironment => ExecuteUsableInstructions(localEnvironment, usableInstructions))
-                        .And(newKeyValuePairs => env = UpdateEnvironment(env, newKeyValuePairs)))
-                    .And(_ => !env.Environment.ContainsKey("a") && env.Instructions.Count > 0))
+                    .Map(usableInstructions => RemoveUsableInstructions(env)
+                        .Map(localEnvironment => ExecuteUsableInstructions(localEnvironment, usableInstructions))
+                        .Map(newKeyValuePairs => env = UpdateEnvironment(env, newKeyValuePairs)))
+                    .Map(_ => !env.Environment.ContainsKey("a") && env.Instructions.Count > 0))
             .Aggregate((_, b) => b)
             .Tap(_ => env.Environment["a"]);
 
@@ -93,7 +93,7 @@ public static class Solution2015day0007
 
     private static LocalEnvironment RemoveUsableInstructions(LocalEnvironment env)
         => env.Instructions.RemoveAll(i => IsExecutable(env.Environment, i as dynamic))
-            .And(_ => env);
+            .Map(_ => env);
 
     private static IList<IInstruction> GetUsableInstructions(LocalEnvironment env)
         => env.Instructions
@@ -103,12 +103,12 @@ public static class Solution2015day0007
     private static LocalEnvironment ExecuteNumberAssignments(LocalEnvironment env)
         => env.Instructions.OfType<NumberAssignment>()
             .Select(Execute)
-            .And(newKeyValuePairs => env with
+            .Map(newKeyValuePairs => env with
             {
                 Environment = new ReadOnlyDictionary<string, int>(
                     new Dictionary<string, int>(newKeyValuePairs))
             }) 
-            .And(RemoveNumberAssignmentInstructions);
+            .Map(RemoveNumberAssignmentInstructions);
 
     private static LocalEnvironment RemoveNumberAssignmentInstructions(LocalEnvironment env)
         =>  env.Tap(e => e.Instructions.RemoveAll(i => i is NumberAssignment));
@@ -125,7 +125,7 @@ public static class Solution2015day0007
 
     private static KeyValuePair<string, int> Execute(IReadOnlyDictionary<string, int> env, RegisterAssignment instruction)
         => env.ContainsKey(instruction.reg1)
-            .And(containsKey => containsKey 
+            .Map(containsKey => containsKey 
                 ? new KeyValuePair<string, int>(instruction.dest, env[instruction.reg1])
                 : throw new ArgumentException(
                     $"Invalid instruction RegisterAssignment {instruction.reg1} -> {instruction.dest}"));

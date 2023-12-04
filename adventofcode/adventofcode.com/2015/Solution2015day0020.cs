@@ -31,7 +31,7 @@ public static class Solution2015day0020
     // just part 1 - I just validated that I can make it faster and keep it functional
     public static int Solve(int limit, int numberOfDeliveredPresentsPerHouse, int numberOfStops)
         => CreateDictionaryOfHouses(limit)
-            .And(currentElvesHouses => GetFirstHouseOverTheLimit(limit, currentElvesHouses));
+            .Map(currentElvesHouses => GetFirstHouseOverTheLimit(limit, currentElvesHouses));
 
     private static int GetFirstHouseOverTheLimit(int limit, ReadOnlyDictionary<int, List<int>> currentElvesHouses)
         => Enumerable.Range(1, limit / 10)

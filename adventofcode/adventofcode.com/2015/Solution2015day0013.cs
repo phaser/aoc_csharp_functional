@@ -10,9 +10,9 @@ public static partial class Solution2015day0013
 
     public static int SolvePart1(string input)
         => ParseInput(input)
-            .And(CreateState)
-            .And(ExtractListOfParticipants)
-            .And(state => state.Participants.ToArray()
+            .Map(CreateState)
+            .Map(ExtractListOfParticipants)
+            .Map(state => state.Participants.ToArray()
                 .Permutations()
                 .Select(p => p.Zip(p.Skip(1).Append(p[0]), (a, b) =>
                 {
@@ -24,9 +24,9 @@ public static partial class Solution2015day0013
 
     public static int SolvePart2(string input)
         => ParseInput(input)
-            .And(CreateState)
-            .And(ExtractListOfParticipants)
-            .And(state => state.Participants.Append("Me").ToArray()
+            .Map(CreateState)
+            .Map(ExtractListOfParticipants)
+            .Map(state => state.Participants.Append("Me").ToArray()
                 .Permutations()
                 .Select(p => p.Zip(p.Skip(1).Append(p[0]), (a, b) =>
                 {
@@ -53,7 +53,7 @@ public static partial class Solution2015day0013
         => input.Split("\n")
             .Select(l => l.Trim())
             .Select(l => ParseInputRegex().Match(l)
-                .And(match => new GainRelation(
+                .Map(match => new GainRelation(
                     match.Groups["name"].Value,
                     match.Groups["nextname"].Value,
                     (match.Groups["gain"].Value == "gain" ? 1 : -1) * int.Parse(match.Groups["points"].Value))));
