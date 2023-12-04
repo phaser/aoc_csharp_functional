@@ -8,7 +8,7 @@ public static partial class Solution2015day0015
 
     public static long SolvePart1(string input)
         => ParseInput(input)
-            .And(ingredients => 
+            .Map(ingredients => 
                 GenerateCombinationsOfTeaspoons(ingredients.Count)
                     .Select(combo => ComputeComboScore(combo, ingredients))
                     .Select(AdjustNegativeCombos)
@@ -17,7 +17,7 @@ public static partial class Solution2015day0015
 
     public static long SolvePart2(string input)
         => ParseInput(input)
-            .And(ingredients => 
+            .Map(ingredients => 
                 GenerateCombinationsOfTeaspoons(ingredients.Count)
                     .Select(combo => ComputeComboScore(combo, ingredients))
                     .Where(FilterNon500CaloriesCombos)
@@ -64,7 +64,7 @@ public static partial class Solution2015day0015
     private static List<Ingredient> ParseInput(string input)
         => input.Split('\n').Select(l => l.Trim())
             .Select(l => InputParseRegex().Match(l)
-                .And(match => new Ingredient(
+                .Map(match => new Ingredient(
                     Name: match.Groups["name"].Value,
                     Capacity: match.Groups["capacity"].Value.ToInt(),
                     Durability: match.Groups["durability"].Value.ToInt(),

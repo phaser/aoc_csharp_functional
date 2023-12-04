@@ -20,13 +20,13 @@ public partial class Solution2015day0012
 
     public static int SolvePart2(string input)
         => JsonSerializer.Deserialize<ExpandoObject>(input)
-            .And(json => json
+            .Map(json => json
                 .Select(c => c.Value as JsonElement?)
                 .Where(obj => obj.HasValue)
                 .Select(obj => obj.Value)
                 .ToList())
-            .And(list => new Environment() { List = list })
-            .And(env => Enumerable.Range(0, Int32.MaxValue)
+            .Map(list => new Environment() { List = list })
+            .Map(env => Enumerable.Range(0, Int32.MaxValue)
                 .TakeWhile(idx =>
                 {
                     var node = env.List[idx];
@@ -45,7 +45,7 @@ public partial class Solution2015day0012
                     return idx < env.List.Count - 1;
                 })
                 .Aggregate((a, b) => b)
-                .And(_ => env.Sum));
+                .Map(_ => env.Sum));
     
     [GeneratedRegex("-?[0-9]+")]
     private static partial Regex MatchNumberRegex();

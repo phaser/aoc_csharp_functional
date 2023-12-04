@@ -2,8 +2,8 @@
 
 using System.Reflection;
 
-var url = "https://adventofcode.com/2015/day/22";
-var year = "2015";
+var url = "https://adventofcode.com/2023/day/1";
+var year = "2023";
 var solutionFolder = GetSolutionFolder();
 var libFolder = Path.Combine(solutionFolder, "adventofcode");
 var testFolder = Path.Combine(solutionFolder, "adventofcode.tests");

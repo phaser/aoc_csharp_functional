@@ -6,38 +6,37 @@ public static class Solution2015day0018
     public static int SolvePart1(string input, int steps)
         => input
             .Parse()
-            .And(board => SolvePart1Internal(board, steps, new BoardCache(board.Width, board.Height)));
+            .Map(board => SolvePart1Internal(board, steps, new BoardCache(board.Width, board.Height)));
 
     public static int SolvePart2(string input, int steps)
         => input
             .Parse()
-            .And(board => SolvePart2Internal(board, steps, new BoardCache(board.Width, board.Height)));
+            .Map(board => SolvePart2Internal(board, steps, new BoardCache(board.Width, board.Height)));
 
     private static Board Parse(this string input)
         => input
             .Split('\n')
             .Select(l => l.Trim())
             .ToList()
-            .And(lines => new Board(lines.Count, lines.Count)
-                .And(board => lines.Select((l, x) => l.Select((c, y) => board.Set(x, y, c == '#' ? 1 : 0)).ToList())
-                    .ToList()
-                    .And(_ => board)));
+            .Map(lines => new Board(lines.Count, lines.Count)
+                .Map(board => FunctionalExtensions.Map(lines.Select((l, x) => l.Select((c, y) => board.Set(x, y, c == '#' ? 1 : 0)).ToList())
+                        .ToList(), _ => board)));
 
     private static int SolvePart1Internal(Board currentBoard, int steps, BoardCache cache)
         => Enumerable.Range(0, steps)
             .Select(step => ComputeNewStep(currentBoard, cache, GetNewCellValue))
             .Aggregate((a, b) => b)
-            .And(_ => CountOnLights(currentBoard));
+            .Map(_ => CountOnLights(currentBoard));
 
     private static int SolvePart2Internal(Board currentBoard, int steps, BoardCache cache)
         => Enumerable.Range(0, steps)
             .Select(step => 
                 SetFourCornersOn(currentBoard)
-                    .And(_ => ComputeNewStep(currentBoard, cache, GetNewCellValue))
-                    .And(_ => SetFourCornersOn(currentBoard))
-                    .And(_ => 0))    
+                    .Map(_ => ComputeNewStep(currentBoard, cache, GetNewCellValue))
+                    .Map(_ => SetFourCornersOn(currentBoard))
+                    .Map(_ => 0))    
             .Sum()
-            .And(_ => CountOnLights(currentBoard));
+            .Map(_ => CountOnLights(currentBoard));
 
     private static Board SetFourCornersOn(Board currentBoard)
         => currentBoard.Tap(cb =>
@@ -53,7 +52,7 @@ public static class Solution2015day0018
 
     private static int ComputeNewStep(Board currentBoard, BoardCache cache, Func<Board, (int x, int y), int> getNewCellValue) 
         => cache.Get()
-            .And(newBoard => (currentBoard.Width, currentBoard.Height)
+            .Map(newBoard => (currentBoard.Width, currentBoard.Height)
                 .CrossRange()
                 .Select(v => newBoard.Set(v.x, v.y, getNewCellValue(currentBoard, v)))
                 .Aggregate((a, b) => b)
@@ -62,7 +61,7 @@ public static class Solution2015day0018
                     currentBoard.Copy(latestBoard);
                     cache.Return(latestBoard);
                 }))
-            .And(_ => 0);
+            .Map(_ => 0);
 
     private static int GetNewCellValue(Board currentBoard, (int x, int y) v) 
         => currentBoard.Get(v.x, v.y) != 0 ? GetLightOnValue(currentBoard, v) : GetLightOffValue(currentBoard, v);

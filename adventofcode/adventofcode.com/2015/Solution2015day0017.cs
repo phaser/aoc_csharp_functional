@@ -8,21 +8,21 @@ public static class Solution2015day0017
     public static int SolvePart1(string input, int quantity)
         =>  input
             .Parse()
-            .And(containers => ComputeMatchingBarrelCombinations(quantity, containers))
+            .Map(containers => ComputeMatchingBarrelCombinations(quantity, containers))
             .Count();
 
     public static int SolvePart2(string input, int quantity)
         => input
             .Parse()
-            .And(containers => ComputeMatchingBarrelCombinations(quantity, containers))
-            .And(FilterMinBarrelCombinations)
+            .Map(containers => ComputeMatchingBarrelCombinations(quantity, containers))
+            .Map(FilterMinBarrelCombinations)
             .Count();
 
     private static IEnumerable<Combination> FilterMinBarrelCombinations(IEnumerable<Combination> configurations)
         => configurations
             .MinBy(c => c.Sum)!
             .Combo.GetBits(32).Count(b => b == 1)
-            .And(minBarrels => 
+            .Map(minBarrels => 
                 configurations
                     .Where(c => c.Combo.GetBits().Count(b => b == 1) == minBarrels));
 
