@@ -5,7 +5,7 @@ namespace adventofcode.adventofcode.com._2023;
 
 public class Solution2023day0002
 {
-    private record Draw(int red, int green, int blue);
+    private record Draw(int Red, int Green, int Blue);
 
     private record Game(int Id)
     {
@@ -14,8 +14,22 @@ public class Solution2023day0002
 
     public static long SolvePart1(string input)
         => DecodeInput(input)
-            .ToArray()
-            .Map(_ => 0);
+            .Where(game => IsValid(game, new Draw(12, 13, 14)))
+            .Select(game => game.Id)
+            .Sum();
+
+    public static long SolvePart2(string input)
+        => DecodeInput(input)
+            .Select(PowerSet)
+            .Select(powerSet => (long) powerSet.Red * powerSet.Green * powerSet.Blue)
+            .Sum();
+
+    private static Draw PowerSet(Game game)
+        => game.Draws.Aggregate((a, b) =>
+            new Draw(Math.Max(a.Red, b.Red), Math.Max(a.Green, b.Green), Math.Max(a.Blue, b.Blue)));
+
+    private static bool IsValid(Game game, Draw total)
+        => !game.Draws.Any(game => game.Red > total.Red || game.Blue > total.Blue || game.Green > total.Green);
 
     private static IEnumerable<Game> DecodeInput(string input)
         => input.Split("\n")
@@ -33,7 +47,7 @@ public class Solution2023day0002
     private static Draw DecodeDraw(string drawStr, Tuple<Game, string[]> game)
         => drawStr.Split(",")
             .Select(ComponentToDraw)
-            .Aggregate((a, b) => new Draw(a.red + b.red, a.green + b.green, a.blue + b.blue));
+            .Aggregate((a, b) => new Draw(a.Red + b.Red, a.Green + b.Green, a.Blue + b.Blue));
 
     private static Draw ComponentToDraw(string component) 
         => component.Contains("red")
