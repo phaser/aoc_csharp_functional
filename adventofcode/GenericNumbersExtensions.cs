@@ -7,7 +7,7 @@ public static class GenericNumbersExtensions
     
     public static IList<IList<int>> GenericNumbers(int numberOfDigits, int root, Func<IList<int>, bool> filter)
         => new int[root]
-            .And(combination =>
+            .Map(combination =>
             {
                 IList<IList<int>> allNumbers = new List<IList<int>>();
                 while (true)
