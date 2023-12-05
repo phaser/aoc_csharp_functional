@@ -6,23 +6,13 @@ namespace adventofcode.tests.adventofcode.com._2023;
 public class Testing2023day0001
 {
     [TestCase(TestInput, 142)]
-    public void TestSolutionDay1Sample(string input, long expectedResult)
-    {
-        Solution2023day0001.SolveDay1A(input).Should().Be(expectedResult);
-    }
-
     [TestCase(MainInput, 56049)]
     public void TestSolutionDay1(string input, long expectedResult)
     {
         Solution2023day0001.SolveDay1A(input).Should().Be(expectedResult);
     }
-
-    [TestCase(TestInputB, 281)]
-    public void TestSolutionDay1BSample(string input, long expectedResult)
-    {
-        Solution2023day0001.SolveDay1B(input).Should().Be(expectedResult);
-    }
     
+    [TestCase(TestInputB, 281)]
     [TestCase(MainInput, 54530)]
     public void TestSolutionDay1B(string input, long expectedResult)
     {
