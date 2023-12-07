@@ -5,10 +5,17 @@ namespace adventofcode.tests.adventofcode.com._2023;
 public class Testing2023day0003
 {
     [TestCase(TestInput, 4361)]
-    [TestCase(MainInput, 0)]
-    public void TestSolution(string input, long expectedSum)
+    [TestCase(MainInput, 546563)]
+    public void TestSolutionPart1(string input, long expectedSum)
     {
         Solution2023day0003.SolvePart1(input).Should().Be(expectedSum);
+    }
+
+    [TestCase(TestInput, 467835)]
+    [TestCase(MainInput, 91031374)]
+    public void TestSolutionPart2(string input, long expectedSum)
+    {
+        Solution2023day0003.SolvePart2(input).Should().Be(expectedSum);
     }
 
     private const string TestInput = @"467..114..
