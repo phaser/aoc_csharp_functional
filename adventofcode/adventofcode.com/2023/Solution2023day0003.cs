@@ -59,7 +59,7 @@ public partial class Solution2023day0003
             (range.Start <= num.Start && range.End >= num.End));
     
     private static Func<ProblemData, ProblemData> ExtractNumbers(string input)
-    => problemData => input
+        => problemData => input
             .Split("\n")
             .Select((line, lineIdx) => new
             {
