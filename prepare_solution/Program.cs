@@ -2,7 +2,7 @@
 
 using System.Reflection;
 
-var url = "https://adventofcode.com/2023/day/3";
+var url = "https://adventofcode.com/2023/day/5";
 var year = "2023";
 var solutionFolder = GetSolutionFolder();
 var libFolder = Path.Combine(solutionFolder, "adventofcode");
@@ -28,6 +28,8 @@ namespace adventofcode.{uri.Host}._{year};
 
 public class Solution{solutionName}
 {{
+    public static long SolvePart1(string input)
+        => throw new NotImplementedException();
 }}
 ");
 
@@ -44,16 +46,20 @@ solutionNamespace = "adventofcode.tests." + uri.Host + "."
                             .Where(p => !string.IsNullOrEmpty(p))
                             .Select(p => char.IsDigit(p[0]) ? $"_{int.Parse(p):0000}" : p)
                             .Aggregate((a, b) => a + "." + b);
-File.WriteAllText(Path.Combine(problemDirectory, $"Testing{solutionName}.cs"), $@"
+File.WriteAllText(Path.Combine(problemDirectory, $"Testing{solutionName}.cs"), $@"using adventofcode.adventofcode.com._{year};
+
 namespace adventofcode.tests.{uri.Host}._{year};
 
 public class Testing{solutionName}
 {{
-    [TestCase]
-    public void TestSolution()
+    [TestCase(TestInput, 0)]
+    [TestCase(MainInput, 0)]
+    public void TestSolutionPart1(string input, long expectedResult)
     {{
+        Solution{solutionName}.SolvePart1(input).Should().Be(expectedResult);
     }}
 
+    private const string TestInput = @""{{input}}"";    
     private const string MainInput = @""{{input}}"";
 }}
 ");
