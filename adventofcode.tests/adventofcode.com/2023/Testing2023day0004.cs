@@ -11,6 +11,13 @@ public class Testing2023day0004
         Solution2023day0004.SolvePart1(input).Should().Be(expectedResult);
     }
 
+    [TestCase(TestInput, 30)]
+    [TestCase(MainInput, 9881048)]
+    public void TestSolutionPart2(string input, long expectedResult)
+    {
+        Solution2023day0004.SolvePart2(input).Should().Be(expectedResult);
+    }
+
     private const string TestInput = @"Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
 Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
