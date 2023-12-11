@@ -1,4 +1,5 @@
 
+using System.Collections;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 
@@ -13,8 +14,8 @@ public partial class Solution2023day0004
     public static long SolvePart1(string input)
         => input.Split("\n")
             .Select(line => ParseCard(line)
-                .Map(card => card.CardNumbers.Where(card.WinningNumbers.Contains))
-                .Map(winningNumbers => winningNumbers.Any() ? 1 << (winningNumbers.Count() - 1) : 0)
+                .Map(GetWinningNumbers)
+                .Map(winningNumbers => winningNumbers.Any() ? 1 << (winningNumbers.Count - 1) : 0)
             )
             .Sum();
 
@@ -23,16 +24,21 @@ public partial class Solution2023day0004
             .Select(ParseCard)
             .ToList()
             .Map(cards => new ProblemData(new Dictionary<int, int>(cards.Select(card => new KeyValuePair<int, int>(card.Id, 1))), cards)
-            .Map(problemData => problemData.Cards
-                .Select(card => card.CardNumbers.Where(card.WinningNumbers.Contains)
-                    .ToList()
-                    .Map(winningNumbers => Enumerable.Range(1, winningNumbers.Count)
-                        .Select(i => problemData.Multipliers.ContainsKey(card.Id + i) 
-                            ? problemData.Multipliers[card.Id + i] += problemData.Multipliers[card.Id] 
-                            : 0)
-                        .ToList()
-                        .Map(_ => problemData.Multipliers[card.Id])))))
+                .Map(problemData => problemData.Cards
+                    .Select(card => GetWinningNumbers(card)
+                        .Map(winningNumbers => UpdateMultipliers(winningNumbers, problemData, card))
+                        .Map(_ => problemData.Multipliers[card.Id]))))
             .Sum();
+
+    private static List<int> UpdateMultipliers(ICollection winningNumbers, ProblemData problemData, Card card)
+        => Enumerable.Range(1, winningNumbers.Count)
+            .Select(i => problemData.Multipliers.ContainsKey(card.Id + i) 
+                ? problemData.Multipliers[card.Id + i] += problemData.Multipliers[card.Id] 
+                : 0)
+            .ToList();
+
+    private static List<long> GetWinningNumbers(Card card)
+        => card.CardNumbers.Where(card.WinningNumbers.Contains).ToList();
 
     private static Card ParseCard(string line)
         => line.Split(":")
