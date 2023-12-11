@@ -26,17 +26,12 @@ public partial class Solution2023day0004
             .Map(problemData => problemData.Cards
                 .Select(card => card.CardNumbers.Where(card.WinningNumbers.Contains)
                     .ToList()
-                    .Map(winningNumbers =>
-                    {
-                        for (var i = 0; i < winningNumbers.Count; i++)
-                        {
-                            if (problemData.Multipliers.ContainsKey(card.Id + i + 1))
-                                problemData.Multipliers[card.Id + i + 1] += problemData.Multipliers[card.Id];
-                        }
-                        return problemData.Multipliers[card.Id]; 
-                    })
-                ))
-            )
+                    .Map(winningNumbers => Enumerable.Range(1, winningNumbers.Count)
+                        .Select(i => problemData.Multipliers.ContainsKey(card.Id + i) 
+                            ? problemData.Multipliers[card.Id + i] += problemData.Multipliers[card.Id] 
+                            : 0)
+                        .ToList()
+                        .Map(_ => problemData.Multipliers[card.Id])))))
             .Sum();
 
     private static Card ParseCard(string line)
